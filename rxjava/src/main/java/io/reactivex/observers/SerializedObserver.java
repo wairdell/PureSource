@@ -37,7 +37,7 @@ public final class SerializedObserver<T> implements Observer<T>, Disposable {
     static final int QUEUE_LINK_SIZE = 4;
 
     Disposable upstream;
-
+    /** 保证同一时间只有一个线程调用下游相关的订阅方法(onNext, onComplete, onError) */
     boolean emitting;
     AppendOnlyLinkedArrayList<Object> queue;
 

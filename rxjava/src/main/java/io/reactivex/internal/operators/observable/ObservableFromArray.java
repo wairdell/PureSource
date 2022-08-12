@@ -44,7 +44,7 @@ public final class ObservableFromArray<T> extends Observable<T> {
         final T[] array;
 
         int index;
-
+        /** 融合模式 为 true 时，不会主动调 onNext 方法给下游发送数据，而是需要下游自己 poll 出数据 */
         boolean fusionMode;
 
         volatile boolean disposed;

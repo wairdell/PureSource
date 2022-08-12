@@ -51,6 +51,7 @@ public final class ObservableConcatMap<T, U> extends AbstractObservableWithUpstr
         }
 
         if (delayErrors == ErrorMode.IMMEDIATE) {
+            //upstream => SourceObserver => SerializedObserver => downstream
             SerializedObserver<U> serial = new SerializedObserver<U>(observer);
             source.subscribe(new SourceObserver<T, U>(serial, mapper, bufferSize));
         } else {
@@ -184,6 +185,7 @@ public final class ObservableConcatMap<T, U> extends AbstractObservableWithUpstr
                     queue.clear();
                     return;
                 }
+                //使用 active 保证一个转换后的 Observable 订阅事件没结束前，不转换和订阅其他的 Observable
                 if (!active) {
 
                     boolean d = done;

@@ -144,6 +144,7 @@ final class ExchangeFinder {
       // Attempt to use an already-allocated connection. We need to be careful here because our
       // already-allocated connection may have been restricted from creating new exchanges.
       releasedConnection = transmitter.connection;
+      //注意 transmitter.releaseConnectionNoEvents 调用后 transmitter.connection 可能会变为 null
       toClose = transmitter.connection != null && transmitter.connection.noNewExchanges
           ? transmitter.releaseConnectionNoEvents()
           : null;

@@ -73,6 +73,9 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
 
         volatile boolean cancelled;
 
+        /**
+         * 转换后的 Observable对应的 Observer
+         */
         final AtomicReference<InnerObserver<?, ?>[]> observers;
 
         static final InnerObserver<?, ?>[] EMPTY = new InnerObserver<?, ?>[0];
@@ -118,6 +121,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
             }
             ObservableSource<? extends U> p;
             try {
+                //调用设置的 mapper 转换成 Observable
                 p = ObjectHelper.requireNonNull(mapper.apply(t), "The mapper returned a null ObservableSource");
             } catch (Throwable e) {
                 Exceptions.throwIfFatal(e);
@@ -262,11 +266,14 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
 
         void tryEmit(U value, InnerObserver<T, U> inner) {
             if (get() == 0 && compareAndSet(0, 1)) {
+                //如果并发调同时间调tryEmit方法或者drainLoop方法执行中都不会走到这
                 downstream.onNext(value);
                 if (decrementAndGet() == 0) {
                     return;
                 }
+                //标记点1,走到这代表并发了，其他线程+1，然后这里不return，用这个线程去drainLoop
             } else {
+                //并发访问tryEmit会先把数据放入到这
                 SimpleQueue<U> q = inner.queue;
                 if (q == null) {
                     q = new SpscLinkedArrayQueue<U>(bufferSize);
@@ -274,9 +281,11 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                 }
                 q.offer(value);
                 if (getAndIncrement() != 0) {
+                    //标记点2 这里跟标记点1互斥，如果 drainLoop 调用了就不必在调用 drainLoop
                     return;
                 }
             }
+            //如果并发访问tryEmit方法，会走到这里
             drainLoop();
         }
 
@@ -330,6 +339,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
         void drainLoop() {
             final Observer<? super U> child = this.downstream;
             int missed = 1;
+            //这个 for 循环是执行这个方法的时候数据可能有更新，有更新则继续取数据
             for (;;) {
                 if (checkTerminate()) {
                     return;
@@ -364,6 +374,8 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                     }
                 }
 
+                //判断上游的流和转换后的流是否结束,给下游回调 onComplete 或者 onError。 n == 0 说明转换后的 Observable 的订阅已结束。
+                //上游的 onComplete 和转换后的 Observable 的 onComplete 回调时都可能触发这个判断
                 if (d && (svq == null || svq.isEmpty()) && n == 0 && nSources == 0) {
                     Throwable ex = errors.terminate();
                     if (ex != ExceptionHelper.TERMINATED) {
@@ -380,7 +392,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                 if (n != 0) {
                     long startId = lastId;
                     int index = lastIndex;
-
+                    //寻找经过上次循环后，这次需要从那个位置开始，因为 observers 数组会产生变化，所以重新寻找
                     if (n <= index || inner[index].id != startId) {
                         if (n <= index) {
                             index = 0;
@@ -402,6 +414,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
 
                     int j = index;
                     sourceLoop:
+                    //外层 for 循环是 observers 数组有多个 InnerObserver
                     for (int i = 0; i < n; i++) {
                         if (checkTerminate()) {
                             return;
@@ -411,6 +424,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                         InnerObserver<T, U> is = (InnerObserver<T, U>)inner[j];
                         SimpleQueue<U> q = is.queue;
                         if (q != null) {
+                            //这个 for 循环是从一个 InnerObserver 缓存队列中拿数据
                             for (;;) {
                                 U o;
                                 try {
@@ -478,6 +492,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                     continue;
                 }
                 missed = addAndGet(-missed);
+                //这里判断所有的数据都给下游发送没，因为数据每更新一次数值都会加1,然后missed记录处理前的当前数值，等处理完成后再减掉missed,如果等于0，说明没有数据更新，不等于0则数据有更新，继续取
                 if (missed == 0) {
                     break;
                 }
@@ -524,6 +539,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
         final MergeObserver<T, U> parent;
 
         volatile boolean done;
+        //一种情况是同步融合是等于QueueDisposable，还一种情况是 tryEmit 并发时等于缓存数据的队列
         volatile SimpleQueue<U> queue;
 
         int fusionMode;
