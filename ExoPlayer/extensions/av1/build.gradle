@@ -63,7 +63,7 @@ if (project.file('src/main/jni/libgav1').exists()) {
 }
 
 dependencies {
-    implementation project(modulePrefix + 'library-core')
+    implementation project(modulePrefix + 'library:core')
     implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
 }
 

@@ -44,8 +44,8 @@ android {
 }
 
 dependencies {
-    implementation project(modulePrefix + 'library-core')
-    implementation project(modulePrefix + 'library-ui')
-    implementation project(modulePrefix + 'library-dash')
+    implementation project(modulePrefix + 'library:core')
+    implementation project(modulePrefix + 'library:ui')
+    implementation project(modulePrefix + 'library:dash')
     implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
 }

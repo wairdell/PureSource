@@ -13,7 +13,6 @@
 // limitations under the License.
 apply from: '../../constants.gradle'
 apply plugin: 'com.android.library'
-
 android {
     compileSdkVersion project.ext.compileSdkVersion
 
@@ -33,8 +32,8 @@ android {
 dependencies {
     api 'com.google.android.gms:play-services-cast-framework:18.1.0'
     implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
-    implementation project(modulePrefix + 'library-core')
-    implementation project(modulePrefix + 'library-ui')
+    implementation project(modulePrefix + 'library:core')
+    implementation project(modulePrefix + 'library:ui')
     compileOnly 'org.checkerframework:checker-qual:' + checkerframeworkVersion
     compileOnly 'org.checkerframework:checker-compat-qual:' + checkerframeworkVersion
     testImplementation project(modulePrefix + 'testutils')

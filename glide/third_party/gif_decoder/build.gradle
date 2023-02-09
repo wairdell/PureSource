@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation "androidx.annotation:annotation:1.0.0"
+
+//    testImplementation project(':testutil')
+    testImplementation "androidx.annotation:annotation:1.0.0"
+    testImplementation "com.google.truth:truth:0.45"
+    testImplementation "junit:junit:4.13-beta-3"
+    testImplementation "org.mockito:mockito-core:2.23.4"
+    testImplementation "org.robolectric:robolectric:4.3.1"
+}
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 28
+    }
+}
+
+//apply from: "${rootProject.projectDir}/scripts/upload.gradle"

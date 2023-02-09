@@ -175,6 +175,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
 
         boolean addInner(InnerObserver<T, U> inner) {
             for (;;) {
+                //这里循环，相当于锁自旋
                 InnerObserver<?, ?>[] a = observers.get();
                 if (a == CANCELLED) {
                     inner.dispose();

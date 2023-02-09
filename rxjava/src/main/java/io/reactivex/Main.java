@@ -18,7 +18,7 @@ import io.reactivex.schedulers.Schedulers;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        ExecutorService executorService = Executors.newCachedThreadPool();
+       /* ExecutorService executorService = Executors.newCachedThreadPool();
         Observable.just("a", "b", "c", "d").concatMap(new Function<String, ObservableSource<String>>() {
             @Override
             public ObservableSource<String> apply(@NonNull String s) throws Exception {
@@ -61,6 +61,27 @@ public class Main {
             @Override
             public void onNext(@NonNull String s) {
                 System.out.println("onNext =>" + s);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                System.out.println("onError");
+            }
+
+            @Override
+            public void onComplete() {
+                System.out.println("onComplete");
+            }
+        });*/
+        Observable.merge(Observable.just("1", "2"), Observable.just("3", "4")).filter().subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                System.out.println("onSubscribe");
+            }
+
+            @Override
+            public void onNext(@NonNull String s) {
+                System.out.println("onNext => " + s);
             }
 
             @Override

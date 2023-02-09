@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    implementation project(modulePrefix + 'library-core')
+    implementation project(modulePrefix + 'library:core')
     implementation 'androidx.work:work-runtime:2.3.4'
 }
 

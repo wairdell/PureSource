@@ -8,5 +8,62 @@ include ':app', ':recyclerview', ':paging-common', ':paging-runtime', ':rxjava',
         ':eventbus:EventBus', ':eventbus:EventBusAnnotationProcessor',
         ':swiperefreshlayout', ':coordinatorlayout'
 include ':SmartRefreshLayout:refresh-layout', ':SmartRefreshLayout:refresh-header', ':SmartRefreshLayout:refresh-footer'
+
+include ':ExoPlayer:library:all'
+include ':ExoPlayer:library:core'
+include ':ExoPlayer:library:dash'
+include ':ExoPlayer:library:hls'
+include ':ExoPlayer:library:smoothstreaming'
+include ':ExoPlayer:library:ui'
+include ':ExoPlayer:testutils'
+include ':ExoPlayer:playbacktests'
+include ':ExoPlayer:demos:cast'
+include ':ExoPlayer:demos:gl'
+//include ':ExoPlayer:demos:cast'
+/*include ':ExoPlayer:demo-cast'
+project(':ExoPlayer:demo-cast').projectDir = new File(rootDir, 'ExoPlayer/demos/cast')*/
+include ':ExoPlayer:demos:main'
+include ':ExoPlayer:demos:surface'
+include ':ExoPlayer:extensions-cast'
+project(':ExoPlayer:extensions-cast').projectDir = new File(rootDir, 'ExoPlayer/extensions/cast')
+include ':ExoPlayer:extension-av1'
+project(':ExoPlayer:extension-av1').projectDir = new File(rootDir, 'ExoPlayer/extensions/av1')
+include ':ExoPlayer:extension-cronet'
+project(':ExoPlayer:extension-cronet').projectDir = new File(rootDir, 'ExoPlayer/extensions/cronet')
+include ':ExoPlayer:extension-ffmpeg'
+project(':ExoPlayer:extension-ffmpeg').projectDir = new File(rootDir, 'ExoPlayer/extensions/ffmpeg')
+include ':ExoPlayer:extension-flac'
+project(':ExoPlayer:extension-flac').projectDir = new File(rootDir, 'ExoPlayer/extensions/flac')
+include ':ExoPlayer:extension-gvr'
+project(':ExoPlayer:extension-gvr').projectDir = new File(rootDir, 'ExoPlayer/extensions/gvr')
+include ':ExoPlayer:extension-ima'
+project(':ExoPlayer:extension-ima').projectDir = new File(rootDir, 'ExoPlayer/extensions/ima')
+include ':ExoPlayer:extension-jobdispatcher'
+project(':ExoPlayer:extension-jobdispatcher').projectDir = new File(rootDir, 'ExoPlayer/extensions/jobdispatcher')
+include ':ExoPlayer:extension-leanback'
+project(':ExoPlayer:extension-leanback').projectDir = new File(rootDir, 'ExoPlayer/extensions/leanback')
+include ':ExoPlayer:extension-mediasession'
+project(':ExoPlayer:extension-mediasession').projectDir = new File(rootDir, 'ExoPlayer/extensions/mediasession')
+include ':ExoPlayer:extension-okhttp'
+project(':ExoPlayer:extension-okhttp').projectDir = new File(rootDir, 'ExoPlayer/extensions/okhttp')
+include ':ExoPlayer:extension-opus'
+project(':ExoPlayer:extension-opus').projectDir = new File(rootDir, 'ExoPlayer/extensions/opus')
+include ':ExoPlayer:extension-rtmp'
+project(':ExoPlayer:extension-rtmp').projectDir = new File(rootDir, 'ExoPlayer/extensions/rtmp')
+include ':ExoPlayer:extension-vp9'
+project(':ExoPlayer:extension-vp9').projectDir = new File(rootDir, 'ExoPlayer/extensions/vp9')
+include ':ExoPlayer:extension-workmanager'
+project(':ExoPlayer:extension-workmanager').projectDir = new File(rootDir, 'ExoPlayer/extensions/workmanager')
+
+include ':glide:library'
+include ':glide:library:pmd'
+include ':glide:library:findbugs'
+include ':glide:library:test'
+include ':glide:third_party:gif_decoder'
+include ':glide:third_party:disklrucache'
+include ':glide:annotation'
+include ':glide:annotation:compiler'
+include ':glide:annotation:compiler:test'
+
 rootProject.name = 'PureSource'
 include ':java'

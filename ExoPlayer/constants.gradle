@@ -37,7 +37,7 @@ project.ext {
     androidxTestRunnerVersion = '1.2.0'
     androidxTestRulesVersion = '1.2.0'
     truthVersion = '0.44'
-    modulePrefix = ':'
+    modulePrefix = ':ExoPlayer:'
     if (gradle.ext.has('exoplayerModulePrefix')) {
         modulePrefix += gradle.ext.exoplayerModulePrefix
     }
