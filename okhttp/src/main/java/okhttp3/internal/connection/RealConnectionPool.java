@@ -53,6 +53,7 @@ public final class RealConnectionPool {
   private final Runnable cleanupRunnable = () -> {
     while (true) {
       long waitNanos = cleanup(System.nanoTime());
+      //如果返回-1说明没有要清除的realConnection,结束循环
       if (waitNanos == -1) return;
       if (waitNanos > 0) {
         long waitMillis = waitNanos / 1000000L;
@@ -174,6 +175,7 @@ public final class RealConnectionPool {
         RealConnection connection = i.next();
 
         // If the connection is in use, keep searching.
+        //判断当前连接有没有正在使用
         if (pruneAndGetAllocationCount(connection, now) > 0) {
           inUseConnectionCount++;
           continue;
@@ -181,26 +183,32 @@ public final class RealConnectionPool {
 
         idleConnectionCount++;
 
+        //算出当前连接已经存活的时间
         // If the connection is ready to be evicted, we're done.
         long idleDurationNs = now - connection.idleAtNanos;
+        //找出存活最久的那个连接
         if (idleDurationNs > longestIdleDurationNs) {
           longestIdleDurationNs = idleDurationNs;
           longestIdleConnection = connection;
         }
       }
 
+      //如果最大存活的连接超过了keep-alive设置的时间或者没有正在使用的连接数超过了maxIdleConnections则从连接池中移除
       if (longestIdleDurationNs >= this.keepAliveDurationNs
           || idleConnectionCount > this.maxIdleConnections) {
         // We've found a connection to evict. Remove it from the list, then close it below (outside
         // of the synchronized block).
         connections.remove(longestIdleConnection);
       } else if (idleConnectionCount > 0) {
+        //如果还存在没有正在使用的连接，但是存活时间没超过keep-alive设置的时间并且个数没超过最大的个数，返回还要等多久的时间才能进行下次清除操作
         // A connection will be ready to evict soon.
         return keepAliveDurationNs - longestIdleDurationNs;
       } else if (inUseConnectionCount > 0) {
+        //如果都是正在使用的连接，则直接返回keep-alive设置的时间，也就是5分钟
         // All connections are in use. It'll be at least the keep alive duration 'til we run again.
         return keepAliveDurationNs;
       } else {
+        //没有任何的连接
         // No connections, idle or in use.
         cleanupRunning = false;
         return -1;

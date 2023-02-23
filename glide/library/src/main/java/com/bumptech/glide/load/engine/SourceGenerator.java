@@ -104,6 +104,7 @@ class SourceGenerator implements DataFetcherGenerator, DataFetcherGenerator.Fetc
       Encoder<Object> encoder = helper.getSourceEncoder(dataToCache);
       DataCacheWriter<Object> writer =
           new DataCacheWriter<>(encoder, dataToCache, helper.getOptions());
+      //缓存原始数据到磁盘
       originalKey = new DataCacheKey(loadData.sourceKey, helper.getSignature());
       helper.getDiskCache().put(originalKey, writer);
       if (Log.isLoggable(TAG, Log.VERBOSE)) {
@@ -140,9 +141,11 @@ class SourceGenerator implements DataFetcherGenerator, DataFetcherGenerator.Fetc
   void onDataReadyInternal(LoadData<?> loadData, Object data) {
     DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();
     if (data != null && diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) {
+      //如果开启了原始数据缓存走这里
       dataToCache = data;
       // We might be being called back on someone else's thread. Before doing anything, we should
       // reschedule to get back onto Glide's thread.
+      //重新执行 DecodeJob.run 因为可能这里的线程不是 Glide 的线程所以没有直接调用 run 而是回调给 EngineJob 再用线程池执行
       cb.reschedule();
     } else {
       cb.onDataFetcherReady(

@@ -144,17 +144,20 @@ final class ExchangeFinder {
       // Attempt to use an already-allocated connection. We need to be careful here because our
       // already-allocated connection may have been restricted from creating new exchanges.
       releasedConnection = transmitter.connection;
-      //注意 transmitter.releaseConnectionNoEvents 调用后 transmitter.connection 可能会变为 null
+      //findHealthyConnection调用此方法后，会判断 connection 是否健康(isHealthy),如果不健康者将 connection.noNewExchanges 设置 true
+      //注意 transmitter.releaseConnectionNoEvents 调用后 transmitter.connection 一定会变为 null
       toClose = transmitter.connection != null && transmitter.connection.noNewExchanges
           ? transmitter.releaseConnectionNoEvents()
           : null;
 
       if (transmitter.connection != null) {
+        //如果当前connection不为空可以直接使用
         // We had an already-allocated connection and it's good.
         result = transmitter.connection;
         releasedConnection = null;
       }
 
+      //当前这个connection不能使用，尝试从连接池里面获取一个请求
       if (result == null) {
         // Attempt to get a connection from the pool.
         if (connectionPool.transmitterAcquirePooledConnection(address, transmitter, null, false)) {
@@ -177,12 +180,14 @@ final class ExchangeFinder {
       eventListener.connectionAcquired(call, result);
     }
     if (result != null) {
+      //找到一条可复用的连接
       // If we found an already-allocated or pooled connection, we're done.
       return result;
     }
 
     // If we need a route selection, make one. This is a blocking operation.
     boolean newRouteSelection = false;
+    //切换路由再在连接池里面找下，如果有则返回
     if (selectedRoute == null && (routeSelection == null || !routeSelection.hasNext())) {
       newRouteSelection = true;
       routeSelection = routeSelector.next();
@@ -193,6 +198,7 @@ final class ExchangeFinder {
       if (transmitter.isCanceled()) throw new IOException("Canceled");
 
       if (newRouteSelection) {
+        // 切换路由后，用新的路由信息再次尝试从池中获取连接
         // Now that we have a set of IP addresses, make another attempt at getting a connection from
         // the pool. This could match due to connection coalescing.
         routes = routeSelection.getAll();
@@ -204,10 +210,11 @@ final class ExchangeFinder {
       }
 
       if (!foundPooledConnection) {
+
         if (selectedRoute == null) {
           selectedRoute = routeSelection.next();
         }
-
+        //没找到则创建一个新的连接
         // Create a connection and assign it to this allocation immediately. This makes it possible
         // for an asynchronous cancel() to interrupt the handshake we're about to do.
         result = new RealConnection(connectionPool, selectedRoute);
@@ -215,12 +222,14 @@ final class ExchangeFinder {
       }
     }
 
+    // 不是新建的连接而是找到的连接则直接返回
     // If we found a pooled connection on the 2nd time around, we're done.
     if (foundPooledConnection) {
       eventListener.connectionAcquired(call, result);
       return result;
     }
 
+    // 建立连接,开始握手
     // Do TCP + TLS handshakes. This is a blocking operation.
     result.connect(connectTimeout, readTimeout, writeTimeout, pingIntervalMillis,
         connectionRetryEnabled, call, eventListener);
@@ -241,6 +250,7 @@ final class ExchangeFinder {
         // that case we will retry the route we just successfully connected with.
         nextRouteToTry = selectedRoute;
       } else {
+        //新连接放入到连接池
         connectionPool.put(result);
         transmitter.acquireConnectionNoEvents(result);
       }

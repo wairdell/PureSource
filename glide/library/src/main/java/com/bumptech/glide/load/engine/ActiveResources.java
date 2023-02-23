@@ -113,7 +113,7 @@ final class ActiveResources {
         return;
       }
     }
-
+    //因内存回收原因将活动缓存的数据转移到内存缓存
     EngineResource<?> newResource =
         new EngineResource<>(
             ref.resource, /*isMemoryCacheable=*/ true, /*isRecyclable=*/ false, ref.key, listener);

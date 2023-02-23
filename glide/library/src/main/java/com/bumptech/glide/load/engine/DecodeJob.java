@@ -427,6 +427,7 @@ class DecodeJob<R>
     }
     Resource<R> resource = null;
     try {
+      //将Data解码为Resource
       resource = decodeFromData(currentFetcher, currentData, currentDataSource);
     } catch (GlideException e) {
       e.setLoggingDetails(currentAttemptingKey, currentDataSource);
@@ -457,6 +458,7 @@ class DecodeJob<R>
     stage = Stage.ENCODE;
     try {
       if (deferredEncodeManager.hasResourceToEncode()) {
+        //缓存转换过后的数据磁盘
         deferredEncodeManager.encode(diskCacheProvider, options);
       }
     } finally {
@@ -565,6 +567,7 @@ class DecodeJob<R>
     Resource<Z> transformed = decoded;
     if (dataSource != DataSource.RESOURCE_DISK_CACHE) {
       appliedTransformation = decodeHelper.getTransformation(resourceSubClass);
+      //将Resource转换为TransfomedResource
       transformed = appliedTransformation.transform(glideContext, decoded, width, height);
     }
     // TODO: Make this the responsibility of the Transformation.

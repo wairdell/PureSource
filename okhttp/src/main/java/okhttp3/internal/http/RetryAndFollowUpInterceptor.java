@@ -74,6 +74,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor {
     Transmitter transmitter = realChain.transmitter();
 
     int followUpCount = 0;
+    //重试时上一次的响应对象
     Response priorResponse = null;
     while (true) {
       transmitter.prepareToConnect(request);
@@ -116,6 +117,7 @@ public final class RetryAndFollowUpInterceptor implements Interceptor {
 
       Exchange exchange = Internal.instance.exchange(response);
       Route route = exchange != null ? exchange.connection().route() : null;
+      //判断是否需要重试，followUp 为 null 代表不需要重试
       Request followUp = followUpRequest(response, route);
 
       if (followUp == null) {

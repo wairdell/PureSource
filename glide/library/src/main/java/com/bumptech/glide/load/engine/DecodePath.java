@@ -56,6 +56,7 @@ public class DecodePath<DataType, ResourceType, Transcode> {
       @NonNull Options options,
       DecodeCallback<ResourceType> callback)
       throws GlideException {
+    //原始数据进行编码、转换
     Resource<ResourceType> decoded = decodeResource(rewinder, width, height, options);
     Resource<ResourceType> transformed = callback.onResourceDecoded(decoded);
     return transcoder.transcode(transformed, options);

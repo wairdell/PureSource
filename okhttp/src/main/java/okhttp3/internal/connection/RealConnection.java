@@ -118,7 +118,7 @@ public final class RealConnection extends Http2Connection.Listener implements Co
    */
   private int allocationLimit = 1;
 
-  /** Current calls carried by this connection. */
+  /** Current calls carried by this connection.有多少个 Call 正在使用此连接 */
   final List<Reference<Transmitter>> transmitters = new ArrayList<>();
 
   /** Nanotime timestamp when {@code allocations.size()} reached zero. */
@@ -295,7 +295,7 @@ public final class RealConnection extends Http2Connection.Listener implements Co
       protocol = Protocol.HTTP_1_1;
       return;
     }
-
+    //https 协议握手
     eventListener.secureConnectStart(call);
     connectTls(connectionSpecSelector);
     eventListener.secureConnectEnd(call, handshake);
@@ -471,12 +471,15 @@ public final class RealConnection extends Http2Connection.Listener implements Co
    * {@code route} is the resolved route for a connection.
    */
   boolean isEligible(Address address, @Nullable List<Route> routes) {
+    //如果当前这次连接的最大并发数达到上限，false
     // If this connection is not accepting new exchanges, we're done.
     if (transmitters.size() >= allocationLimit || noNewExchanges) return false;
 
+    // 如果两个address的其他参数不相同，false
     // If the non-host fields of the address don't overlap, we're done.
     if (!Internal.instance.equalsNonHost(this.route.address(), address)) return false;
 
+    // 如果两个address的url的host相同，true,复用这条连接
     // If the host exactly matches, we're done: this connection can carry the address.
     if (address.url().host().equals(this.route().address().url().host())) {
       return true; // This connection is a perfect match.
@@ -487,12 +490,15 @@ public final class RealConnection extends Http2Connection.Listener implements Co
     // https://hpbn.co/optimizing-application-delivery/#eliminate-domain-sharding
     // https://daniel.haxx.se/blog/2016/08/18/http2-connection-coalescing/
 
+    // 首先这个连接需要时HTTP/2
     // 1. This connection must be HTTP/2.
     if (http2Connection == null) return false;
 
+    // 这些路由必须共享一个 IP 地址。
     // 2. The routes must share an IP address.
     if (routes == null || !routeMatchesAny(routes)) return false;
 
+    // 此连接的服务器证书必须涵盖新主机。
     // 3. This connection's server certificate's must cover the new host.
     if (address.hostnameVerifier() != OkHostnameVerifier.INSTANCE) return false;
     if (!supportsUrl(address.url())) return false;

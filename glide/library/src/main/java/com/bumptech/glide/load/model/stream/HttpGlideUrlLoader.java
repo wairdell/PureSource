@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.bumptech.glide.load.Option;
 import com.bumptech.glide.load.Options;
-import com.bumptech.glide.load.data.HttpUrlFetcher;
+import com.bumptech.glide.load.data. HttpUrlFetcher;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.ModelCache;
 import com.bumptech.glide.load.model.ModelLoader;

@@ -173,7 +173,7 @@ public class Engine
       ResourceCallback cb,
       Executor callbackExecutor) {
     long startTime = VERBOSE_IS_LOGGABLE ? LogTime.getLogTime() : 0;
-
+    //开始加载资源，先查找活动缓存和内存缓存，如果没有开启或监听已存在的任务(EngineJob 和 DecodeJob)
     EngineKey key =
         keyFactory.buildKey(
             model,
@@ -372,6 +372,8 @@ public class Engine
       EngineJob<?> engineJob, Key key, EngineResource<?> resource) {
     // A null resource indicates that the load failed, usually due to an exception.
     if (resource != null && resource.isMemoryCacheable()) {
+      //DecodeJob.decodeFromRetrievedData -> DecodeJob.notifyEncodeAndRelease ->
+      // EngineJob.onResourceReady -> EnginJob.notifyCallbacksOfResult
       activeResources.activate(key, resource);
     }
 

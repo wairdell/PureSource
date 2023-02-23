@@ -113,6 +113,7 @@ class EngineResource<Z> implements Resource<Z> {
       }
     }
     if (release) {
+      //因引用计数为0将活动缓存的数据转移到内存缓存
       listener.onResourceReleased(key, this);
     }
   }
