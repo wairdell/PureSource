@@ -1,13 +1,33 @@
-include ':firebase-perf-plugin'
-include ':firebase-pref'
-include ':app', ':recyclerview', ':paging-common', ':paging-runtime', ':rxjava',
-        ':okhttp', ':retrofit', ':leakcanary', ':material', ':adapter-rxjava2',
-        ':fragmentation:fragmentation_core', ':fragmentation:fragmentation_swipeback',
-        ':fragmentation:fragmentation', ':fragmentation:eventbus_activity_scope',
-        ':sticky_headers_recyclerview',':gson',
-        ':eventbus:EventBus', ':eventbus:EventBusAnnotationProcessor',
-        ':swiperefreshlayout', ':coordinatorlayout'
-include ':SmartRefreshLayout:refresh-layout', ':SmartRefreshLayout:refresh-header', ':SmartRefreshLayout:refresh-footer'
+include ':app', ':rxjava',
+        ':okhttp', ':retrofit', ':adapter-rxjava2', ':gson'
+
+include ':widget:material',
+        ':widget:sticky_headers_recyclerview',
+        ':widget:swiperefreshlayout',
+        ':widget:coordinatorlayout',
+        ':widget:recyclerview'
+
+include ':paging:paging-common',
+        ':paging:paging-runtime'
+
+include ':firebase:firebase-perf-plugin',
+        ':firebase:firebase-pref'
+
+include ':eventbus:EventBus',
+        ':eventbus:EventBusAnnotationProcessor'
+
+include ':fragmentation:fragmentation_core',
+        ':fragmentation:fragmentation_swipeback',
+        ':fragmentation:fragmentation',
+        ':fragmentation:eventbus_activity_scope'
+
+include ':leakcanary:leakcanary-object-watcher',
+        ':leakcanary:leakcanary-android-core'
+
+include ':SmartRefreshLayout:refresh-layout',
+        ':SmartRefreshLayout:refresh-header',
+        ':SmartRefreshLayout:refresh-footer'
+
 
 include ':ExoPlayer:library:all'
 include ':ExoPlayer:library:core'
@@ -67,3 +87,4 @@ include ':glide:annotation:compiler:test'
 
 rootProject.name = 'PureSource'
 include ':java'
+include ':gradle-source'

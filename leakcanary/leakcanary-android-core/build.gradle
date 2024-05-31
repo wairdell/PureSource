@@ -1,0 +1,51 @@
+plugins {
+  id("com.android.library")
+  id("org.jetbrains.kotlin.android")
+}
+
+dependencies {
+//  api project(':shark-android')
+  api 'com.squareup.leakcanary:shark:2.8.1'
+  api project(':leakcanary:leakcanary-object-watcher')
+  api "com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.8.1"
+  api "com.squareup.leakcanary:shark-android:2.8.1"
+//  api project(':leakcanary-object-watcher-android-core')
+//  api project(':leakcanary-object-watcher-android-androidx')
+//  api project(':leakcanary-object-watcher-android-support-fragments')
+//  implementation libs.kotlin.stdlib
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.50"
+  testImplementation "org.assertj:assertj-core:3.9.1"
+  testImplementation "junit:junit:4.12"
+  testImplementation "org.jetbrains.kotlin:kotlin-reflect:1.3.72"
+  testImplementation "org.mockito:mockito-core:3.5.10"
+  testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+ /* testImplementation libs.assertjCore
+  testImplementation libs.junit
+  testImplementation libs.kotlin.reflect
+  testImplementation libs.mockito
+  testImplementation libs.mockitoKotlin*/
+  // Optional dependency
+//  compileOnly libs.androidX.work.runtime
+//  compileOnly libs.androidX.work.multiprocess
+}
+
+def gitSha() {
+  return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+android {
+  resourcePrefix 'leak_canary_'
+  compileSdkVersion 31
+  defaultConfig {
+    minSdkVersion 14
+    buildConfigField "String", "LIBRARY_VERSION", "\"2.8.1\""
+    buildConfigField "String", "GIT_SHA", "\"${gitSha()}\""
+    consumerProguardFiles 'consumer-proguard-rules.pro'
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+  lintOptions {
+    disable 'GoogleAppIndexingWarning'
+    error 'ObsoleteSdkInt'
+//    checkOnly 'Interoperability'
+  }
+}

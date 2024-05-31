@@ -1,0 +1,13 @@
+apply plugin: 'java-library'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+//  implementation libs.kotlin.stdlib
+//  api project(':shark-log')
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.72"
+  api "com.squareup.leakcanary:shark-log:2.8.1"
+  testImplementation 'junit:junit:4.12'
+
+}
