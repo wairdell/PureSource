@@ -132,6 +132,7 @@ public final class Retrofit {
   @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
   public <T> T create(final Class<T> service) {
     // 动态代理实现 service 方法请求
+    //检测传进来的 Service 是不是有效
     validateServiceInterface(service);
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
         new InvocationHandler() {
@@ -142,9 +143,11 @@ public final class Retrofit {
               @Nullable Object[] args) throws Throwable {
             // If the method is a method from Object then defer to normal invocation.
             if (method.getDeclaringClass() == Object.class) {
+              //判断是不是 Object 定义的方法
               return method.invoke(this, args);
             }
             if (platform.isDefaultMethod(method)) {
+              //判断是不是 java8 默认方法
               return platform.invokeDefaultMethod(method, service, proxy, args);
             }
             return loadServiceMethod(method).invoke(args != null ? args : emptyArgs);
@@ -154,6 +157,7 @@ public final class Retrofit {
 
   private void validateServiceInterface(Class<?> service) {
     if (!service.isInterface()) {
+      //service 必须是接口
       throw new IllegalArgumentException("API declarations must be interfaces.");
     }
 
@@ -162,6 +166,7 @@ public final class Retrofit {
     while (!check.isEmpty()) {
       Class<?> candidate = check.removeFirst();
       if (candidate.getTypeParameters().length != 0) {
+        //service 接口或者继承的接口定义不能声明泛型
         StringBuilder message = new StringBuilder("Type parameters are unsupported on ")
             .append(candidate.getName());
         if (candidate != service) {
@@ -174,6 +179,7 @@ public final class Retrofit {
     }
 
     if (validateEagerly) {
+      //validateEagerly开启后，在create的时候就遍历所有方法，对方法创建对应的 ServiceMethod 对象，ServiceMethod 对线创建的时候会解析注解，如果配置不正确就报错
       Platform platform = Platform.get();
       for (Method method : service.getDeclaredMethods()) {
         if (!platform.isDefaultMethod(method) && !Modifier.isStatic(method.getModifiers())) {

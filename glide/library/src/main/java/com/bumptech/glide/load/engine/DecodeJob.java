@@ -78,44 +78,39 @@ class DecodeJob<R>
   private volatile boolean isCancelled;
   private boolean isLoadingFromAlternateCacheKey;
 
-  DecodeJob(DiskCacheProvider diskCacheProvider, Pools.Pool<DecodeJob<?>> pool) {
-    this.diskCacheProvider = diskCacheProvider;
-    this.pool = pool;
-  }
-
   DecodeJob<R> init(
-      GlideContext glideContext,
-      Object model,
-      EngineKey loadKey,
-      Key signature,
-      int width,
-      int height,
-      Class<?> resourceClass,
-      Class<R> transcodeClass,
-      Priority priority,
-      DiskCacheStrategy diskCacheStrategy,
-      Map<Class<?>, Transformation<?>> transformations,
-      boolean isTransformationRequired,
-      boolean isScaleOnlyOrNoTransform,
-      boolean onlyRetrieveFromCache,
-      Options options,
-      Callback<R> callback,
-      int order) {
+          GlideContext glideContext,
+          Object model,
+          EngineKey loadKey,
+          Key signature,
+          int width,
+          int height,
+          Class<?> resourceClass,
+          Class<R> transcodeClass,
+          Priority priority,
+          DiskCacheStrategy diskCacheStrategy,
+          Map<Class<?>, Transformation<?>> transformations,
+          boolean isTransformationRequired,
+          boolean isScaleOnlyOrNoTransform,
+          boolean onlyRetrieveFromCache,
+          Options options,
+          Callback<R> callback,
+          int order) {
     decodeHelper.init(
-        glideContext,
-        model,
-        signature,
-        width,
-        height,
-        diskCacheStrategy,
-        resourceClass,
-        transcodeClass,
-        priority,
-        options,
-        transformations,
-        isTransformationRequired,
-        isScaleOnlyOrNoTransform,
-        diskCacheProvider);
+            glideContext,
+            model,
+            signature,
+            width,
+            height,
+            diskCacheStrategy,
+            resourceClass,
+            transcodeClass,
+            priority,
+            options,
+            transformations,
+            isTransformationRequired,
+            isScaleOnlyOrNoTransform,
+            diskCacheProvider);
     this.glideContext = glideContext;
     this.signature = signature;
     this.priority = priority;
@@ -130,6 +125,11 @@ class DecodeJob<R>
     this.runReason = RunReason.INITIALIZE;
     this.model = model;
     return this;
+  }
+
+  DecodeJob(DiskCacheProvider diskCacheProvider, Pools.Pool<DecodeJob<?>> pool) {
+    this.diskCacheProvider = diskCacheProvider;
+    this.pool = pool;
   }
 
   /**

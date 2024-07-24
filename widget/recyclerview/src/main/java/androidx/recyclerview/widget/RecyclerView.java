@@ -5934,6 +5934,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
             }
             boolean fromScrapOrHiddenOrCache = false;
             ViewHolder holder = null;
+            //预布局 属于特殊情况 从mChangedScrap中获取ViewHolder
             // 0) If there is a changed scrap, try to find from there
             if (mState.isPreLayout()) {
                 holder = getChangedScrapViewForPosition(position);
@@ -5941,6 +5942,8 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
             }
             // 1) Find by position from scrap/hidden list/cache
             if (holder == null) {
+                //1、尝试从mAttachedScrap中获取ViewHolder,此时获取的是屏幕中可见范围中的ViewHolder
+                //2、mAttachedScrap缓存中没有的话，继续从mCachedViews尝试获取ViewHolder
                 holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
                 if (holder != null) {
                     if (!validateViewHolderForOffsetPosition(holder)) {
@@ -5972,6 +5975,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                 }
 
                 final int type = mAdapter.getItemViewType(offsetPosition);
+                //如果Adapter中声明了Id，尝试从id中获取，这里不属于缓存
                 // 2) Find from scrap/cache via stable ids, if exists
                 if (mAdapter.hasStableIds()) {
                     holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition),
@@ -5983,6 +5987,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                     }
                 }
                 if (holder == null && mViewCacheExtension != null) {
+                    //3、从自定义缓存mViewCacheExtension中尝试获取ViewHolder，该缓存需要开发者实现
                     // We are NOT sending the offsetPosition because LayoutManager does not
                     // know it.
                     final View view = mViewCacheExtension
@@ -6005,8 +6010,10 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                         Log.d(TAG, "tryGetViewHolderForPositionByDeadline("
                                 + position + ") fetching from shared pool");
                     }
+                    //4、从缓存池mRecyclerPool中尝试获取ViewHolder
                     holder = getRecycledViewPool().getRecycledView(type);
                     if (holder != null) {
+                        //如果获取成功，会重置ViewHolder状态，所以需要重新执行Adapter#onBindViewHolder绑定数据
                         holder.resetInternal();
                         if (FORCE_INVALIDATE_DISPLAY_LIST) {
                             invalidateDisplayListInt(holder);
@@ -6020,6 +6027,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                         // abort - we have a deadline we can't meet
                         return null;
                     }
+                    //5、若以上缓存中都没有找到对应的ViewHolder，最终会调用Adapter中的onCreateViewHolder创建一个
                     holder = mAdapter.createViewHolder(RecyclerView.this, type);
                     if (ALLOW_THREAD_GAP_WORK) {
                         // only bother finding nested RV if prefetching
@@ -6064,6 +6072,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                             + exceptionLabel());
                 }
                 final int offsetPosition = mAdapterHelper.findPositionOffset(position);
+                //6、如果需要绑定数据，会调用Adapter#onBindViewHolder来绑定数据
                 bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);
             }
 

@@ -471,11 +471,11 @@ public final class RealConnection extends Http2Connection.Listener implements Co
    * {@code route} is the resolved route for a connection.
    */
   boolean isEligible(Address address, @Nullable List<Route> routes) {
-    //如果当前这次连接的最大并发数达到上限，false
+    //如果当前这次连接的最大并发数达到上限(http1 allocationLimit是1) 或者 当前连接不能建立新连接，false
     // If this connection is not accepting new exchanges, we're done.
     if (transmitters.size() >= allocationLimit || noNewExchanges) return false;
 
-    // 如果两个address的其他参数不相同，false
+    // 如果两个address的其他参数不相同(dns、代理配置、证书配置、端口)，false
     // If the non-host fields of the address don't overlap, we're done.
     if (!Internal.instance.equalsNonHost(this.route.address(), address)) return false;
 

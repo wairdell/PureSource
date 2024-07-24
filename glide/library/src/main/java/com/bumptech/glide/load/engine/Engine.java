@@ -372,7 +372,7 @@ public class Engine
       EngineJob<?> engineJob, Key key, EngineResource<?> resource) {
     // A null resource indicates that the load failed, usually due to an exception.
     if (resource != null && resource.isMemoryCacheable()) {
-      //DecodeJob.decodeFromRetrievedData -> DecodeJob.notifyEncodeAndRelease ->
+      //DecodeJob.decodeFromRetrievedData -> DecodeJob.notifyEncodeAndRelease -> DecodeJob.notifyComplete
       // EngineJob.onResourceReady -> EnginJob.notifyCallbacksOfResult
       activeResources.activate(key, resource);
     }

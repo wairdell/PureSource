@@ -106,7 +106,9 @@ public final class RealConnectionPool {
       @Nullable List<Route> routes, boolean requireMultiplexed) {
     assert (Thread.holdsLock(this));
     for (RealConnection connection : connections) {
+      //当需要进行多路复用且当前的连接不是 HTTP/2 连接时，则放弃当前连接
       if (requireMultiplexed && !connection.isMultiplexed()) continue;
+      //当前连接不能用于为 address 分配 stream，则放弃当前连接。
       if (!connection.isEligible(address, routes)) continue;
       transmitter.acquireConnectionNoEvents(connection);
       return true;
